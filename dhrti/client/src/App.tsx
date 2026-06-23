@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { PublicLayout } from './layouts/PublicLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminLayout } from './layouts/AdminLayout';
 
 // Lazy-loaded Pages
 const LandingPage = React.lazy(() => import('./pages/HomePage').then(module => ({ default: module.HomePage })));
@@ -19,6 +20,7 @@ const ContactPage = React.lazy(() => import('./pages/ContactPage').then(module =
 const MarketplacePage = React.lazy(() => import('./pages/MarketplacePage').then(module => ({ default: module.MarketplacePage })));
 const LoginPage = React.lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
 const SignupPage = React.lazy(() => import('./pages/SignupPage').then(module => ({ default: module.SignupPage })));
+const PublicSupplierProfile = React.lazy(() => import('./pages/PublicSupplierProfile').then(module => ({ default: module.PublicSupplierProfile })));
 
 const DashboardOverview = React.lazy(() => import('./pages/seller/DashboardOverview').then(module => ({ default: module.DashboardOverview })));
 const MyListings = React.lazy(() => import('./pages/seller/MyListings').then(module => ({ default: module.MyListings })));
@@ -31,6 +33,15 @@ const BuyerRequests = React.lazy(() => import('./pages/buyer/Requests').then(mod
 const BuyerSavedListings = React.lazy(() => import('./pages/buyer/SavedListings').then(module => ({ default: module.SavedListings })));
 const BuyerAnalytics = React.lazy(() => import('./pages/buyer/Analytics').then(module => ({ default: module.Analytics })));
 const BuyerProfile = React.lazy(() => import('./pages/buyer/Profile').then(module => ({ default: module.Profile })));
+
+const AdminDashboard = React.lazy(() => import('./pages/admin/DashboardOverview').then(module => ({ default: module.DashboardOverview })));
+const AdminUsers = React.lazy(() => import('./pages/admin/Users').then(module => ({ default: module.Users })));
+const AdminVerifications = React.lazy(() => import('./pages/admin/Verifications').then(module => ({ default: module.Verifications })));
+const AdminListings = React.lazy(() => import('./pages/admin/Listings').then(module => ({ default: module.Listings })));
+const AdminOrders = React.lazy(() => import('./pages/admin/Orders').then(module => ({ default: module.Orders })));
+const AdminPayments = React.lazy(() => import('./pages/admin/Payments').then(module => ({ default: module.Payments })));
+const AdminReviews = React.lazy(() => import('./pages/admin/Reviews').then(module => ({ default: module.Reviews })));
+const AdminAnalytics = React.lazy(() => import('./pages/admin/Analytics').then(module => ({ default: module.Analytics })));
 
 // Fallback loader
 const PageLoader = () => (
@@ -68,6 +79,7 @@ const App: React.FC = () => {
                   <Route path="/marketplace" element={<MarketplacePage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/suppliers/:id" element={<PublicSupplierProfile />} />
                 </Route>
 
                 <Route
@@ -98,6 +110,24 @@ const App: React.FC = () => {
                   <Route path="saved-listings" element={<BuyerSavedListings />} />
                   <Route path="analytics" element={<BuyerAnalytics />} />
                   <Route path="profile" element={<BuyerProfile />} />
+                </Route>
+
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute allowedRole="admin">
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="verifications" element={<AdminVerifications />} />
+                  <Route path="listings" element={<AdminListings />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="payments" element={<AdminPayments />} />
+                  <Route path="reviews" element={<AdminReviews />} />
+                  <Route path="analytics" element={<AdminAnalytics />} />
                 </Route>
 
                 {/* Fallback Redirect */}

@@ -10,4 +10,10 @@ export const profileService = {
     const response = await api.put('/profile', data);
     return response.data;
   },
+  async uploadVerificationDocuments(data: FormData): Promise<{ success: boolean; message: string; verificationDocuments: string[] }> {
+    const response = await api.post('/profile/upload-verification', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
 };

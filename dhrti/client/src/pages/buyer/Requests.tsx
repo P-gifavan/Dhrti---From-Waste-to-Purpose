@@ -1,8 +1,9 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X as XIcon, CreditCard } from 'lucide-react';
+import { X as XIcon, CreditCard, Star } from 'lucide-react';
 import { orderService } from '../../services/orderService';
 import { paymentService } from '../../services/paymentService';
+import { reviewService } from '../../services/reviewService';
 
 declare global {
   interface Window {
@@ -12,6 +13,10 @@ declare global {
 
 export const Requests: React.FC = () => {
   const queryClient = useQueryClient();
+  const [reviewModalOpen, setReviewModalOpen] = React.useState(false);
+  const [selectedOrder, setSelectedOrder] = React.useState<any>(null);
+  const [rating, setRating] = React.useState(5);
+  const [comment, setComment] = React.useState('');
 
   const { data, isLoading } = useQuery({
     queryKey: ['buyerOrders'],
@@ -24,6 +29,29 @@ export const Requests: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['buyerOrders'] });
     },
   });
+
+  const reviewMutation = useMutation({
+    mutationFn: reviewService.createReview,
+    onSuccess: () => {
+      alert('Review submitted successfully!');
+      setReviewModalOpen(false);
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || 'Failed to submit review');
+    }
+  });
+
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedOrder) {
+      reviewMutation.mutate({
+        orderId: selectedOrder._id,
+        reviewTargetId: selectedOrder.sellerId._id,
+        rating,
+        comment,
+      });
+    }
+  };
 
   const handleCancel = (id: string) => {
     if (confirm('Are you sure you want to cancel this order?')) {
@@ -184,8 +212,16 @@ export const Requests: React.FC = () => {
                           <CreditCard className="w-3.5 h-3.5" /> Pay Now
                         </button>
                       )}
-                      {(req.orderStatus !== 'pending' && req.orderStatus !== 'accepted') && (
+                      {(req.orderStatus !== 'pending' && req.orderStatus !== 'accepted' && req.orderStatus !== 'completed') && (
                         <span className="text-xs text-muted-foreground">No actions</span>
+                      )}
+                      {req.orderStatus === 'completed' && (
+                        <button 
+                          onClick={() => { setSelectedOrder(req); setReviewModalOpen(true); }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-yellow-600 bg-yellow-500/10 hover:bg-yellow-500/20 rounded-md transition-colors ml-auto shadow-sm"
+                        >
+                          <Star className="w-3.5 h-3.5" /> Write Review
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -195,6 +231,55 @@ export const Requests: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {reviewModalOpen && selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-md rounded-xl shadow-2xl p-6 relative">
+            <button onClick={() => setReviewModalOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+              <XIcon className="w-5 h-5" />
+            </button>
+            <h2 className="text-xl font-bold mb-4">Write a Review</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Rate your experience with <strong>{selectedOrder.sellerId?.companyName || selectedOrder.sellerId?.fullName}</strong>.
+            </p>
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Rating</label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`p-1 transition-colors ${rating >= star ? 'text-yellow-500' : 'text-muted'}`}
+                    >
+                      <Star className="w-6 h-6 fill-current" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Comment</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full rounded-md border border-border px-3 py-2 bg-background focus:ring-2 focus:ring-primary outline-none"
+                  placeholder="Share your experience..."
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={reviewMutation.isPending}
+                className="w-full py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {reviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -85,6 +85,15 @@ const userSchema = new mongoose.Schema(
     verificationDocuments: [{
       type: String, // URLs or paths
     }],
+    verificationHistory: [{
+      status: String,
+      timestamp: { type: Date, default: Date.now },
+      notes: String,
+    }],
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const Listing = require('../models/Listing');
+const { createNotification } = require('./notificationController');
 
 // @desc    Create a new order
 // @route   POST /api/orders
@@ -34,6 +35,15 @@ const createOrder = async (req, res) => {
       totalAmount,
       shippingAddress,
     });
+
+    // Notify Seller
+    await createNotification(
+      listing.sellerId,
+      'New Order Received',
+      `You have received a new order for ${quantityKg}kg of ${listing.title}.`,
+      'order_received',
+      '/seller/orders'
+    );
 
     res.status(201).json({
       success: true,
@@ -128,6 +138,22 @@ const updateOrderStatus = async (req, res) => {
     // For now, let's keep it simple.
 
     await order.save();
+
+    // Notify Buyer about status change
+    let notifType = 'system';
+    if (status === 'accepted') notifType = 'order_accepted';
+    if (status === 'rejected') notifType = 'order_rejected';
+    if (status === 'shipped') notifType = 'shipment_updated';
+    
+    if (req.user.role === 'supplier' || req.user.role === 'admin') {
+      await createNotification(
+        order.buyerId,
+        'Order Status Updated',
+        `Your order for listing ${order.listingId} is now ${status}.`,
+        notifType,
+        '/buyer/orders'
+      );
+    }
 
     res.json({ success: true, data: order });
   } catch (error) {

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRole?: 'buyer' | 'supplier';
+  allowedRole?: 'buyer' | 'supplier' | 'admin';
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRole }) => {
@@ -29,7 +29,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
 
   if (allowedRole && user.role !== allowedRole) {
     // Authenticated but incorrect role. Redirect to matching dashboard.
-    const redirectPath = user.role === 'supplier' ? '/seller/dashboard' : '/buyer/dashboard';
+    const redirectPath = user.role === 'admin' ? '/admin/dashboard' : user.role === 'supplier' ? '/seller/dashboard' : '/buyer/dashboard';
     return <Navigate to={redirectPath} replace />;
   }
 

@@ -1,6 +1,6 @@
 export interface User {
   _id: string;
-  role: 'buyer' | 'supplier';
+  role: 'buyer' | 'supplier' | 'admin';
   email: string;
   fullName: string;
   companyName: string;
@@ -10,6 +10,8 @@ export interface User {
   gstNumber?: string;
   procurementPreferences?: string;
   savedListings?: string[];
+  verificationStatus?: 'pending' | 'verified' | 'rejected';
+  verificationDocuments?: string[];
 }
 
 export interface LoginCredentials {

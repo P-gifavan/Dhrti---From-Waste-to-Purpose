@@ -40,7 +40,7 @@ export const ContactPage: React.FC = () => {
     <div className="pt-24 pb-20 bg-background text-foreground min-h-screen">
       <div className="container mx-auto px-6 max-w-6xl">
         <div className="grid md:grid-cols-2 gap-16">
-          
+
           <div>
             <h1 className="text-4xl font-bold tracking-tight mb-6">Get in Touch</h1>
             <p className="text-lg text-muted-foreground mb-12">
@@ -54,7 +54,7 @@ export const ContactPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Email Us</h3>
-                  <p className="text-muted-foreground">support@dhrti.com</p>
+                  <p className="text-muted-foreground">supportdhrti@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -63,7 +63,7 @@ export const ContactPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Call Us</h3>
-                  <p className="text-muted-foreground">+91 (800) 123-4567</p>
+                  <p className="text-muted-foreground">+91 9561287172</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -72,7 +72,7 @@ export const ContactPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Office</h3>
-                  <p className="text-muted-foreground">Eco Tech Park, Bengaluru<br/>Karnataka, India 560100</p>
+                  <p className="text-muted-foreground">Eco Tech Park, Amaravathi<br />Andhra Pradesh, India 522002</p>
                 </div>
               </div>
             </div>
@@ -80,13 +80,13 @@ export const ContactPage: React.FC = () => {
 
           <div className="bg-card p-8 rounded-2xl border border-border shadow-sm">
             <h2 className="text-2xl font-bold mb-6">Send a Message</h2>
-            
+
             {status.type === 'success' && (
               <div className="mb-6 p-4 bg-green-500/15 text-green-600 rounded-lg text-sm font-medium border border-green-500/30">
                 {status.message}
               </div>
             )}
-            
+
             {status.type === 'error' && (
               <div className="mb-6 p-4 bg-destructive/15 text-destructive rounded-lg text-sm font-medium border border-destructive/30">
                 {status.message}
@@ -102,7 +102,7 @@ export const ContactPage: React.FC = () => {
                 />
                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-2">Email Address</label>
                 <input

@@ -17,6 +17,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 export const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -178,9 +179,16 @@ export const DashboardLayout: React.FC = () => {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <span className="text-sm font-semibold text-muted-foreground md:block hidden">
-              Welcome back, <span className="text-foreground font-bold">{user?.fullName}</span>
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-muted-foreground md:block hidden">
+                Welcome back, <span className="text-foreground font-bold">{user?.fullName}</span>
+              </span>
+              {user?.verificationStatus && (
+                <div className="hidden md:block">
+                  <VerificationBadge status={user.verificationStatus} showText={false} />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-4">

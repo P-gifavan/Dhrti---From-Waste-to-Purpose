@@ -2,6 +2,14 @@
 
 Dhrti is a comprehensive B2B marketplace designed to facilitate the circular economy by connecting plastic waste suppliers (collectors, aggregators) with buyers (manufacturers, recyclers). The platform offers a secure, intuitive, and responsive interface to manage listings, track requests, and monitor analytics.
 
+### 🚀 Live Demo
+
+Frontend:
+https:dhrti-from-waste-to-purpose.vercel.app
+
+Backend:
+https://dhrti-backend.onrender.com
+
 ## Features
 
 ### For Suppliers
@@ -134,3 +142,16 @@ You can use the following credentials to test the platform:
 **Buyer Account**
 - **Email**: buyer@demo.dhrti.local
 - **Password**: demo1234
+
+## Developer
+
+Pavan Sushil Wattamwar
+
+B.Tech Computer Science & Engineering
+VIT-AP University
+
+LinkedIn:
+https://www.linkedin.com/in/pavan-wattamwar-tech
+
+GitHub:
+https://github.com/P-gifavan

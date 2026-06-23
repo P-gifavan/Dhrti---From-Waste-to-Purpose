@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { UploadCloud, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileService } from '../../services/profileService';
@@ -8,6 +9,9 @@ export const Profile: React.FC = () => {
   const queryClient = useQueryClient();
   const { fetchProfile } = useAuth();
   const [successMsg, setSuccessMsg] = useState('');
+  const [uploadMsg, setUploadMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [files, setFiles] = useState<FileList | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['profile'],
@@ -56,6 +60,30 @@ export const Profile: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateMutation.mutate(formData);
+  };
+
+  const uploadMutation = useMutation({
+    mutationFn: profileService.uploadVerificationDocuments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      fetchProfile();
+      setUploadMsg('Documents uploaded successfully. Verification is pending.');
+      setFiles(null);
+      setErrorMsg('');
+      setTimeout(() => setUploadMsg(''), 5000);
+    },
+    onError: (err: any) => {
+      setErrorMsg(err.response?.data?.message || 'Failed to upload documents.');
+    }
+  });
+
+  const handleUpload = () => {
+    if (!files || files.length === 0) return;
+    const formDataUpload = new FormData();
+    Array.from(files).forEach((file) => {
+      formDataUpload.append('documents', file);
+    });
+    uploadMutation.mutate(formDataUpload);
   };
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading profile...</div>;
@@ -175,6 +203,79 @@ export const Profile: React.FC = () => {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Verification Section */}
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden p-6 mt-6">
+        <h2 className="text-xl font-semibold mb-4">Business Verification</h2>
+        
+        {data?.data?.verificationStatus === 'verified' && (
+          <div className="flex items-center gap-2 text-green-600 bg-green-500/10 p-4 rounded-lg mb-4 border border-green-500/20">
+            <CheckCircle2 className="w-5 h-5" />
+            <span className="font-medium">Your business is Verified.</span>
+          </div>
+        )}
+        {data?.data?.verificationStatus === 'pending' && (
+          <div className="flex items-center gap-2 text-yellow-600 bg-yellow-500/10 p-4 rounded-lg mb-4 border border-yellow-500/20">
+            <AlertCircle className="w-5 h-5" />
+            <span className="font-medium">Your verification is currently Pending review by admins.</span>
+          </div>
+        )}
+        {data?.data?.verificationStatus === 'rejected' && (
+          <div className="flex items-center gap-2 text-destructive bg-destructive/10 p-4 rounded-lg mb-4 border border-destructive/20">
+            <AlertCircle className="w-5 h-5" />
+            <span className="font-medium">Your last verification was Rejected. Please upload valid documents.</span>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Upload your GST Certificate or Company Registration Proof to get verified. Verified buyers rank higher and gain more trust.
+          </p>
+
+          {uploadMsg && (
+            <div className="p-3 bg-green-500/10 text-green-600 rounded-lg text-sm font-medium border border-green-500/20">
+              {uploadMsg}
+            </div>
+          )}
+          {errorMsg && (
+            <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm font-medium border border-destructive/20">
+              {errorMsg}
+            </div>
+          )}
+
+          <div className="flex items-center gap-4">
+            <input 
+              type="file" 
+              multiple 
+              accept=".jpg,.jpeg,.png,.pdf"
+              onChange={(e) => setFiles(e.target.files)}
+              className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+            />
+            <button 
+              onClick={handleUpload}
+              disabled={!files || files.length === 0 || uploadMutation.isPending}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              <UploadCloud className="w-4 h-4" />
+              {uploadMutation.isPending ? 'Uploading...' : 'Upload'}
+            </button>
+          </div>
+          {data?.data?.verificationDocuments && data.data.verificationDocuments.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2">Uploaded Documents:</h4>
+              <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                {data.data.verificationDocuments.map((doc, idx) => (
+                  <li key={idx}>
+                    <a href={`${import.meta.env.VITE_API_URL?.replace('/api', '')}${doc}`} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                      Document {idx + 1}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
